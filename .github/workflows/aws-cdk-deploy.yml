@@ -7,14 +7,26 @@ jobs:
       run:
         working-directory: ./cloud-resources
     steps:
-      - name: cdk deploy
-        uses: youyo/aws-cdk-github-actions@v2
+      - name: Git clone the repository
+        uses: actions/checkout@v1
+
+      - uses: actions/setup-python@v4
         with:
-          cdk_subcommand: 'deploy'
-          cdk_stack: 'cloud-resources'
-          cdk_args: '--require-approval never'
-          actions_comment: false
-        env:
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          AWS_DEFAULT_REGION: 'us-east-1'
+          python-version: '3.8'
+        - run: pip install -r requirements.txt
+
+      - name: Configure aws credentials
+        uses: aws-actions/configure-aws-credentials@master
+        with:
+          aws-access-key-id: ${{ github.event.inputs.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ github.event.inputs.AWS_SECRET_ACCESS_KEY }}
+          aws-region: 'us-east-1'
+
+      - name: Synth Stack
+        run: cdk synth "cloud-resources"
+
+      - name: Deploy Stack
+        run: cdk deploy "cloud-resources"
+
+
+
