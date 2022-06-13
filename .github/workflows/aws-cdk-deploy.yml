@@ -8,12 +8,10 @@ jobs:
         working-directory: ./cloud-resources
     steps:
       - name: Git clone the repository
-        uses: actions/checkout@v1
-
+        uses: actions/checkout@v3
       - uses: actions/setup-python@v4
         with:
           python-version: '3.8'
-        - run: pip install -r requirements.txt
 
       - name: Configure aws credentials
         uses: aws-actions/configure-aws-credentials@master
@@ -21,6 +19,9 @@ jobs:
           aws-access-key-id: ${{ github.event.inputs.AWS_ACCESS_KEY_ID }}
           aws-secret-access-key: ${{ github.event.inputs.AWS_SECRET_ACCESS_KEY }}
           aws-region: 'us-east-1'
+
+      - name: Install Dependencies
+        run: pip install -r requirements.txt
 
       - name: Synth Stack
         run: cdk synth "cloud-resources"
