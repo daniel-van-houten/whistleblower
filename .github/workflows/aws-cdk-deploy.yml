@@ -10,11 +10,13 @@ jobs:
       - name: Git clone the repository
         uses: actions/checkout@v3
 
-      - name: Setup Node and Install CDK
+      - name: Setup Node
         uses: actions/setup-node@v3
         with:
           node-version: 18
-        - run: npm i -g aws-cdk
+
+      - name: Install CDK
+        run: npm i -g aws-cdk
 
       - name: Setup Python
       - uses: actions/setup-python@v4
