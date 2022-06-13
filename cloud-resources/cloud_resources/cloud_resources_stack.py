@@ -53,6 +53,7 @@ class CloudResourcesStack(Stack):
         send_message_lambda = _lambda.Function(
             self,
             'SendMessageLambda',
+            function_name='pi-send-message',
             runtime=_lambda.Runtime.PYTHON_3_8,
             code=_lambda.Code.from_asset('cloud_resources/lambda'),
             handler='send-message-lambda.handler',

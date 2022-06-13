@@ -15,8 +15,7 @@ def handler(event, context):
 
     client.publish(
         TargetArn=os.environ.get('PI_MESSAGE_TOPIC_ARN'),
-        Message="Intruder Detected!",
-        MessageStructure='json'
+        Message="Intruder Detected!"
     )
 
     return {
