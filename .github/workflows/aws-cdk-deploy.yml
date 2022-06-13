@@ -3,6 +3,9 @@ on: [push]
 jobs:
   aws_cdk:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./cloud-resources
     steps:
       - name: cdk deploy
         uses: youyo/aws-cdk-github-actions@v2
