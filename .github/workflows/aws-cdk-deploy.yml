@@ -37,7 +37,7 @@ jobs:
         run: cdk synth "CloudResourcesStack"
 
       - name: Deploy Stack
-        run: cdk deploy "CloudResourcesStack"
+        run: cdk deploy "CloudResourcesStack" --require-approval never
 
 
 
