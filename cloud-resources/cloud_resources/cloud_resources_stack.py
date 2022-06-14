@@ -45,8 +45,9 @@ class CloudResourcesStack(Stack):
             iam.Policy(self, "pi-fr-user-policy",
                        statements=[
                            iam.PolicyStatement(
-                               actions=["s3:PutObject"],
-                               resources=[bucket.bucket_arn]
+                               actions=["s3:PutObject", "kms:GenerateDataKey"],
+                               resources=[bucket.bucket_arn],
+                               effect=iam.Effect.ALLOW
                            ),
                            iam.PolicyStatement(
                                actions=['sns:Publish'],
