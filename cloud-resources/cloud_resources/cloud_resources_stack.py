@@ -10,7 +10,6 @@ from aws_cdk import (
     aws_s3objectlambda as s3_object_lambda,
     aws_secretsmanager as secrets_manager,
     aws_lambda_event_sources
-
 )
 
 class CloudResourcesStack(Stack):
@@ -38,39 +37,46 @@ class CloudResourcesStack(Stack):
                                secret_name="pi-user-secret",
                                secret_string_value=access_key.secret_access_key)
 
-        # Give the pi user permission to PUT objects in the bucket
-        pi_user.attach_inline_policy(
-            iam.Policy(self, "pi-fr-user-policy",
-                       statements=[iam.PolicyStatement(
-                           actions=["s3:PutObject"],
-                           resources=[bucket.bucket_arn]
-                       )]))
-
         # Create the topic which will send the text message notifications
         message_topic = sns.Topic(self, "PiMessageTopic", topic_name="pi-messages")
 
+        # Give the pi user permission to PUT objects in the bucket
+        pi_user.attach_inline_policy(
+            iam.Policy(self, "pi-fr-user-policy",
+                       statements=[
+                           iam.PolicyStatement(
+                               actions=["s3:PutObject"],
+                               resources=[bucket.bucket_arn]
+                           ),
+                           iam.PolicyStatement(
+                               actions=['sns:Publish'],
+                               resources=[message_topic.topic_arn],
+                               effect=iam.Effect.ALLOW
+                           )
+                       ]))
+
         # Create the Lambda function which will build and send the text message
-        send_message_lambda = _lambda.Function(
-            self,
-            'SendMessageLambda',
-            function_name='pi-send-message',
-            runtime=_lambda.Runtime.PYTHON_3_8,
-            code=_lambda.Code.from_asset('cloud_resources/lambda'),
-            handler='send-message-lambda.handler',
-        )
+        # send_message_lambda = _lambda.Function(
+        #    self,
+        #    'SendMessageLambda',
+        #    function_name='pi-send-message',
+        #    runtime=_lambda.Runtime.PYTHON_3_8,
+        #    code=_lambda.Code.from_asset('cloud_resources/lambda'),
+        #    handler='send-message-lambda.handler',
+        # )
 
         # Add ability to publish to the topic
-        send_message_lambda.add_to_role_policy(iam.PolicyStatement(
-                    actions=['sns:Publish'],
-                    resources=[message_topic.topic_arn],
-                    effect=iam.Effect.ALLOW
-                ))
+        # send_message_lambda.add_to_role_policy(iam.PolicyStatement(
+        #            actions=['sns:Publish'],
+        #            resources=[message_topic.topic_arn],
+        #            effect=iam.Effect.ALLOW
+        #        ))
 
         # Push the message topic ARN into the lambda method
-        send_message_lambda.add_environment('PI_MESSAGE_TOPIC_ARN', message_topic.topic_arn)
+        # send_message_lambda.add_environment('PI_MESSAGE_TOPIC_ARN', message_topic.topic_arn)
 
         # Wire up the s3 bucket to trigger the lambda
-        send_message_lambda.add_event_source(s3_event_source)
+        # send_message_lambda.add_event_source(s3_event_source)
 
         # Print out the access key
         CfnOutput(self, "PiUserAccessKeyId", value=access_key.access_key_id)
