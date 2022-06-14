@@ -45,7 +45,12 @@ class CloudResourcesStack(Stack):
             iam.Policy(self, "pi-fr-user-policy",
                        statements=[
                            iam.PolicyStatement(
-                               actions=["s3:PutObject", "kms:GenerateDataKey"],
+                               actions=["kms:GenerateDataKey",
+                                        "s3:PutObject",
+                                        "s3:PutObjectAcl",
+                                        "s3:GetObject",
+                                        "s3:GetObjectAcl",
+                                        "s3:DeleteObject"],
                                resources=[bucket.bucket_arn],
                                effect=iam.Effect.ALLOW
                            ),
